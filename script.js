@@ -347,11 +347,11 @@ updateClock();
 // TIMETABLE
 const timetable = {
   Monday: [
-    { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BS", room: "RN-4201" },
-    { time: "11:40 AM - 12:35 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BS", room: "RN-4212" },
+    { time: "11:40 AM - 12:35 PM", subject: "WT", teacher: "MB", room: "RN-4212" },
     { time: "12:35 PM - 01:30 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
     { break: true },
-    { time: "02:25 PM - 05:10 PM", subject: "TC Lab", teacher: "SRL", room: "L7 (G2)" }
+    { time: "02:25 PM - 05:10 PM", subject: "TC Lab", teacher: "SRL", room: "L7 (G2)" },
   ],
   Tuesday: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BM", room: "RN-4212" },
@@ -362,7 +362,7 @@ const timetable = {
     { time: "03:20 PM - 04:15 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
     { time: "04:15 PM - 05:10 PM", subject: "ED", teacher: "DRP", room: "RN-3212(B)" }
   ],
-  Sunday: [
+  Wednesday: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "YD", room: "RN-4212" },
     { time: "11:40 AM - 12:35 PM", subject: "Seminar", teacher: "SPP", room: "RN-4201" },
 	{ time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
@@ -387,61 +387,117 @@ const timetable = {
   ]
 };
 
-const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
+
+const currentDay = new Date().toLocaleDateString("en-US",
+{
+	weekday: "long"
+});
 const now = new Date();
 
 // 🗓️ Show today's date beside the header
-document.getElementById("current-date").textContent = new Date().toLocaleDateString("en-GB", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric"
+document.getElementById("current-date").textContent = new Date().toLocaleDateString("en-GB",
+{
+	day: "2-digit",
+	month: "short",
+	year: "numeric"
 });
 
-function parseTime(str) {
-  const [time, period] = str.trim().split(" ");
-  let [hours, minutes] = time.split(":").map(Number);
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  return { hours, minutes };
+function parseTime(str)
+{
+	const [time, period] = str.trim().split(" ");
+	let [hours, minutes] = time.split(":").map(Number);
+	if (period === "PM" && hours !== 12) hours += 12;
+	if (period === "AM" && hours === 12) hours = 0;
+	return {
+		hours,
+		minutes
+	};
 }
 
 function renderTimetable(day) {
   const container = document.getElementById("daily-timetable");
   const todaySchedule = timetable[day] || [];
 
-  let html = `<div class="d-flex flex-column gap-2">`; // vertical stack (column view)
+  let html = `<div class="d-flex flex-column gap-2">`;
 
-  todaySchedule.forEach(item => {
+  todaySchedule.forEach((item, index) => {
     if (item.break) {
       html += `
         <div class="border border-secondary rounded px-3 py-2 text-muted fw-bold bg-light text-center" title="Break Time">
-        [FOOD] Break [FOOD]
+          [FOOD] Break [FOOD]
         </div>`;
     } else {
       const [startStr, endStr] = item.time.split(" - ");
       const startTime = parseTime(startStr);
       const endTime = parseTime(endStr);
 
-      const start = new Date(now);
-      const end = new Date(now);
+      const start = new Date();
+      const end = new Date();
       start.setHours(startTime.hours, startTime.minutes, 0, 0);
       end.setHours(endTime.hours, endTime.minutes, 0, 0);
 
-      let cssClass = "bg-warning text-dark";
-      if (now >= start && now <= end) cssClass = "bg-success text-white";
-      else if (now > end) cssClass = "bg-danger text-white";
+      const now = new Date();
+      const timerId = `timer-${day}-${index}`;
+      const slotId = `slot-${timerId}`;
 
-      const fullLabel = `${item.subject || ''}${item.teacher ? ` (${item.teacher})` : ''}${item.room ? ` [${item.room}]` : ''}`;
+      // ✅ Set correct color immediately
+      let initialClass = "";
+      if (now >= start && now <= end) {
+        initialClass = "bg-success text-white";
+      } else if (now > end) {
+        initialClass = "bg-danger text-white";
+      } else {
+        initialClass = "bg-warning text-dark";
+      }
+
+      const fullLabel = `${item.subject}${item.teacher ? ` (${item.teacher})` : ''}${item.room ? ` [${item.room}]` : ''}`;
 
       html += `
-        <div class="border rounded px-3 py-2 ${cssClass}" title="${item.time}">
-          <div class="fw-bold text-center">${fullLabel}</div>
+        <div id="${slotId}" class="border rounded px-3 py-2 ${initialClass} text-center" title="${item.time}">
+          <div class="d-flex flex-column gap-1">
+            <span class="fw-bold" style="word-break: break-word;">${fullLabel}</span>
+            <span id="${timerId}" class="small fw-normal text-center d-block text-nowrap"></span>
+          </div>
         </div>`;
+
+      // ✅ Only apply timer + dynamic color if current class is running
+      if (now >= start && now <= end) {
+        setInterval(() => {
+          const current = new Date();
+          const diff = end - current;
+          const timerEl = document.getElementById(timerId);
+          const slotEl = document.getElementById(slotId);
+
+          if (!timerEl || !slotEl) return;
+
+          if (diff >= 0) {
+            const hrs = Math.floor(diff / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+            timerEl.textContent = `⏳ ${hrs} hour ${mins} min ${secs} sec left`;
+          } else {
+            timerEl.textContent = `⏳ Over`;
+          }
+
+          // ✅ Reapply correct color
+          slotEl.classList.remove("bg-success", "bg-warning", "bg-danger", "text-white", "text-dark");
+
+          const nowAgain = new Date();
+          if (nowAgain >= start && nowAgain <= end) {
+            slotEl.classList.add("bg-success", "text-white");
+          } else if (nowAgain > end) {
+            slotEl.classList.add("bg-danger", "text-white");
+          } else {
+            slotEl.classList.add("bg-warning", "text-dark");
+          }
+        }, 1000);
+      }
     }
   });
 
   html += `</div>`;
   container.innerHTML = html;
 }
+
 
 renderTimetable(currentDay);
