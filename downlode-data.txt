@@ -1,0 +1,25 @@
+(() => {
+  const allData = {};
+
+  // Loop through all localStorage keys
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    try {
+      allData[key] = JSON.parse(localStorage.getItem(key));
+    } catch (e) {
+      allData[key] = localStorage.getItem(key);
+    }
+  }
+
+  // Create and download the JSON file
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "full_daily_planner_data.json";
+  a.click();
+})();
+
+
+
+//use in console

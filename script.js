@@ -1,0 +1,447 @@
+let todos = [];
+let currentFilter = "all";
+let deleteMode = false;
+
+function toggleTodoForm() {
+	const form = document.getElementById("todoForm");
+	const list = document.getElementById("todo-list");
+	const isHidden = form.classList.contains("d-none");
+
+	if (isHidden) {
+		form.classList.remove("d-none");
+		list.classList.add("d-none");
+	} else {
+		form.classList.add("d-none");
+		list.classList.remove("d-none");
+	}
+}
+
+function getTodayDateStr() {
+	return new Date().toISOString().split("T")[0];
+}
+
+function addTodo() {
+	const title = document.getElementById("todoTitle").value.trim();
+	const priority = document.getElementById("todoPriority").value;
+	const deadline = document.getElementById("todoDeadline").value;
+
+	if (!title || !deadline) return;
+
+	todos.push({
+		title,
+		deadline,
+		priority,
+		status: "Not Done"
+	});
+	saveTodos();
+	toggleTodoForm();
+	document.getElementById("todoTitle").value = "";
+	document.getElementById("todoDeadline").value = "";
+	renderTodos();
+}
+
+function saveTodos() {
+	const today = getTodayDateStr();
+	localStorage.setItem(`todos-${today}`, JSON.stringify(todos));
+}
+
+function loadTodos(date = getTodayDateStr()) {
+	const stored = localStorage.getItem(`todos-${date}`);
+	todos = stored ? JSON.parse(stored) : [];
+	renderTodos();
+}
+
+function renderTodos() {
+	const list = document.getElementById("todo-list");
+	list.innerHTML = "";
+
+	const filtered = todos.filter(todo => {
+		if (currentFilter === "notdone") return todo.status !== "Done";
+		if (currentFilter === "done") return todo.status === "Done";
+		return true;
+	});
+
+	filtered.forEach((todo, index) => {
+		const li = document.createElement("li");
+		li.className = "list-group-item d-flex justify-content-between align-items-center";
+		if (todo.status === "Done") li.classList.add("bg-light", "text-success");
+
+		const leftSection = document.createElement("div");
+		leftSection.className = "d-flex align-items-center gap-2 ";
+
+		const checkbox = document.createElement("input");
+		checkbox.type = "checkbox";
+		checkbox.checked = todo.status === "Done";
+		checkbox.classList.add("form-check-input", "me-2");
+		checkbox.addEventListener("change", () => {
+			todo.status = checkbox.checked ? "Done" : "Not Done";
+			saveTodos();
+			renderTodos();
+		});
+
+		const content = document.createElement("div");
+		let stars = "";
+		if (todo.priority === "High") stars = "⭐⭐⭐";
+		else if (todo.priority === "Medium") stars = "⭐⭐";
+		else if (todo.priority === "Low") stars = "⭐";
+
+		content.innerHTML = `
+  <div class="todo-text-wrap">
+    <strong>${todo.title}</strong><br>
+    <small>🗓️ ${todo.deadline || "No date"}   ${stars}</small>
+  </div>
+`;
+
+		leftSection.appendChild(checkbox);
+		leftSection.appendChild(content);
+
+		li.appendChild(leftSection);
+
+		// ✅ Only show delete button in deleteMode
+		if (deleteMode) {
+			const deleteBtn = document.createElement("button");
+			deleteBtn.className = "btn btn-sm btn-danger";
+			deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+			deleteBtn.title = "Delete Task";
+			deleteBtn.onclick = () => {
+				todos.splice(index, 1);
+				saveTodos();
+				renderTodos();
+			};
+			li.appendChild(deleteBtn);
+		}
+
+		list.appendChild(li);
+	});
+}
+
+function toggleDeleteMode() {
+	deleteMode = !deleteMode;
+	renderTodos();
+
+	const deleteBtn = document.getElementById("deleteToggleBtn");
+	if (deleteBtn) {
+		deleteBtn.classList.toggle("btn-danger", deleteMode);
+		deleteBtn.classList.toggle("btn-outline-dark", !deleteMode);
+		deleteBtn.classList.toggle("blinking-delete", deleteMode);
+	}
+}
+
+
+function filterTodos(type) {
+	currentFilter = type;
+	renderTodos();
+}
+
+// 🛠️ Fix: Dropdown "3 dots" actions
+function handleMenuAction(action, event) {
+	event.preventDefault();
+	event.stopPropagation();
+
+	const form = document.getElementById("todoForm");
+	const list = document.getElementById("todo-list");
+
+	if (action === 'new') {
+		const isHidden = form.classList.contains("d-none");
+		form.classList.toggle("d-none", !isHidden);
+		list.classList.toggle("d-none", isHidden);
+	} else {
+		// Always hide form and show list on other actions
+		form.classList.add("d-none");
+		list.classList.remove("d-none");
+		filterTodos(action);
+	}
+}
+
+// Init on load
+loadTodos();
+
+// ====== LINK SECTION SCRIPT START ======
+let currentLinkGroup = "personal";
+let linkDeleteMode = false;
+
+function toggleLinkForm() {
+	const formWrapper = document.getElementById("linkFormWrapper");
+	const listWrapper = document.getElementById("linkListWrapper");
+
+	const isHidden = formWrapper.classList.contains("d-none");
+
+	formWrapper.classList.toggle("d-none", !isHidden);
+	listWrapper.classList.toggle("d-none", isHidden);
+}
+
+
+function toggleLinkDeleteMode() {
+	linkDeleteMode = !linkDeleteMode;
+	document.getElementById("deleteLinkToggleBtn").classList.toggle("blinking-delete", linkDeleteMode);
+	renderLinks();
+}
+
+function switchLinkGroup(group) {
+	currentLinkGroup = group;
+
+	// Always close form and show link list on tab switch
+	document.getElementById("linkFormWrapper").classList.add("d-none");
+	document.getElementById("linkListWrapper").classList.remove("d-none");
+
+	// Highlight active tab
+	document.querySelectorAll(".link-tab-btn").forEach(btn => {
+		btn.classList.remove("active");
+		if (btn.getAttribute("data-group") === group) {
+			btn.classList.add("active");
+		}
+	});
+
+	renderLinks();
+}
+
+function addLink() {
+	const name = document.getElementById("linkName").value.trim();
+	const url = document.getElementById("linkURL").value.trim();
+	const group = document.getElementById("linkGroup").value;
+	const iconSelect = document.getElementById("linkIcon").value;
+	const color = document.getElementById("linkColor").value;
+	const icon = iconSelect ? `<i class="${iconSelect}"></i>` : guessIcon(name);
+
+	if (!name || !url || !group) return;
+
+	const linkObj = {
+		name,
+		url,
+		icon,
+		color
+	};
+	const existing = JSON.parse(localStorage.getItem(`links-${group}`)) || [];
+	existing.push(linkObj);
+	localStorage.setItem(`links-${group}`, JSON.stringify(existing));
+
+	renderLinks();
+
+	// Hide form, show links
+	document.getElementById("linkFormWrapper").classList.add("d-none");
+	document.getElementById("linkListWrapper").classList.remove("d-none");
+
+	// Reset fields
+	document.getElementById("linkName").value = "";
+	document.getElementById("linkURL").value = "";
+	document.getElementById("linkIcon").value = "";
+	document.getElementById("linkGroup").value = currentLinkGroup;
+	document.getElementById("linkColor").value = "#4b6cb7";
+}
+
+function renderLinks() {
+	const container = document.getElementById("tab-links");
+	container.innerHTML = "";
+
+	const storedLinks = JSON.parse(localStorage.getItem(`links-${currentLinkGroup}`)) || [];
+
+	storedLinks.forEach(link => {
+		const wrapper = document.createElement("div");
+		wrapper.className = "link-wrapper";
+
+		const a = document.createElement("a");
+		a.href = link.url;
+		a.target = "_blank";
+		a.title = link.name;
+		a.innerHTML = link.icon;
+		a.className = "d-flex justify-content-center align-items-center rounded-circle border text-decoration-none";
+		a.style.width = "51.4px";
+		a.style.height = "51.4px";
+		a.style.fontSize = "1.3rem";
+		a.style.background = "var(--input-bg)";
+		a.style.borderColor = "#ccc";
+		a.style.color = "var(--primary)";
+		a.onmouseenter = () => {
+			a.style.background = link.color;
+			a.style.color = "#111";
+		};
+		a.onmouseleave = () => {
+			a.style.background = "var(--input-bg)";
+			a.style.color = "var(--primary)";
+		};
+
+		wrapper.appendChild(a);
+
+		if (linkDeleteMode) {
+			const del = document.createElement("span");
+			del.className = "delete-icon";
+			del.innerHTML = "×";
+			del.onclick = () => {
+				const updated = storedLinks.filter(l => l.url !== link.url);
+				localStorage.setItem(`links-${currentLinkGroup}`, JSON.stringify(updated));
+				renderLinks();
+			};
+			wrapper.appendChild(del);
+		}
+
+		container.appendChild(wrapper);
+	});
+}
+
+function guessIcon(name) {
+	const map = {
+		github: '<i class="fab fa-github"></i>',
+		notion: '<i class="fas fa-book"></i>',
+		chatgpt: '<i class="fas fa-robot"></i>',
+		ai: '<i class="fas fa-brain"></i>',
+		code: '<i class="fas fa-code"></i>',
+		youtube: '<i class="fab fa-youtube"></i>',
+		google: '<i class="fab fa-google"></i>',
+		linkedin: '<i class="fab fa-linkedin"></i>'
+	};
+	const key = name.toLowerCase();
+	return map[key] || '<i class="fas fa-link"></i>';
+}
+
+// Init
+switchLinkGroup("personal");
+loadTodos();
+
+document.querySelectorAll(".scroll-select").forEach(select => {
+	select.addEventListener("wheel", (e) => {
+		e.preventDefault();
+		const options = select.options;
+		const index = select.selectedIndex;
+
+		if (e.deltaY > 0 && index < options.length - 1) {
+			select.selectedIndex = index + 1;
+		} else if (e.deltaY < 0 && index > 0) {
+			select.selectedIndex = index - 1;
+		}
+	});
+});
+
+
+// ⏰ Live Clock
+function updateClock() {
+  const now = new Date();
+
+  let hours = now.getHours();
+  let minutes = now.getMinutes();
+  let seconds = now.getSeconds();
+  let session = "AM";
+
+  if (hours >= 12) {
+    session = "PM";
+    if (hours > 12) hours -= 12;
+  }
+  if (hours === 0) hours = 12;
+
+  hours = String(hours).padStart(2, '0');
+  minutes = String(minutes).padStart(2, '0');
+  seconds = String(seconds).padStart(2, '0');
+
+  const timeStr = `${hours}:${minutes}:${seconds} ${session}`;
+  const dayStr = now.toLocaleDateString("en-US", { weekday: "long" });
+  const dateStr = now.toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' });
+
+  document.getElementById("clockTime").textContent = timeStr;
+  document.getElementById("clockDay").textContent = dayStr;
+  document.getElementById("clockDate").textContent = dateStr;
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+
+// TIMETABLE
+const timetable = {
+  Monday: [
+    { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BS", room: "RN-4201" },
+    { time: "11:40 AM - 12:35 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { time: "12:35 PM - 01:30 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { break: true },
+    { time: "02:25 PM - 05:10 PM", subject: "TC Lab", teacher: "SRL", room: "L7 (G2)" }
+  ],
+  Tuesday: [
+    { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BM", room: "RN-4212" },
+    { time: "11:40 AM - 12:35 PM", subject: "Seminar", teacher: "SPP", room: "RN-4201" },
+	{ time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
+    { break: true },
+    { time: "02:25 PM - 03:20 PM", subject: "OS", teacher: "YD", room: "RN-4212" },
+    { time: "03:20 PM - 04:15 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { time: "04:15 PM - 05:10 PM", subject: "ED", teacher: "DRP", room: "RN-3212(B)" }
+  ],
+  Sunday: [
+    { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "YD", room: "RN-4212" },
+    { time: "11:40 AM - 12:35 PM", subject: "Seminar", teacher: "SPP", room: "RN-4201" },
+	{ time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
+    { break: true },
+    { time: "02:25 PM - 03:20 PM", subject: "ED", teacher: "DMS", room: "RN-4212" },
+    { time: "03:20 PM - 04:15 PM", subject: "OS", teacher: "BM", room: "RN-4212" },
+    { time: "04:15 PM - 05:10 PM", subject: "AIML", teacher: "MB", room: "RN-4212" }
+  ],
+  Thursday: [
+    { time: "10:45 AM - 11:40 AM", subject: "ED", teacher: "DRP", room: "RN-3102" },
+    { time: "11:40 AM - 12:35 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
+    { break: true },
+    { time: "02:25 PM - 05:10 PM", subject: "OS Lab", teacher: "YD", room: "L6 (G1)" }
+  ],
+  Friday: [
+    { time: "10:45 AM - 11:40 AM", subject: "AIML", teacher: "MB", room: "RN-4212" },
+    { time: "11:40 AM - 12:35 PM", subject: "OS", teacher: "SM", room: "RN-4212" },
+    { time: "12:35 PM - 01:30 PM", subject: "ED", teacher: "DRP", room: "RN-3116" },
+    { break: true },
+    { time: "02:25 PM - 05:10 PM", subject: "ML Lab", teacher: "PS", room: "L6 (G1)" }
+  ]
+};
+
+const currentDay = new Date().toLocaleDateString("en-US", { weekday: "long" });
+const now = new Date();
+
+// 🗓️ Show today's date beside the header
+document.getElementById("current-date").textContent = new Date().toLocaleDateString("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric"
+});
+
+function parseTime(str) {
+  const [time, period] = str.trim().split(" ");
+  let [hours, minutes] = time.split(":").map(Number);
+  if (period === "PM" && hours !== 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+  return { hours, minutes };
+}
+
+function renderTimetable(day) {
+  const container = document.getElementById("daily-timetable");
+  const todaySchedule = timetable[day] || [];
+
+  let html = `<div class="d-flex flex-column gap-2">`; // vertical stack (column view)
+
+  todaySchedule.forEach(item => {
+    if (item.break) {
+      html += `
+        <div class="border border-secondary rounded px-3 py-2 text-muted fw-bold bg-light text-center" title="Break Time">
+        [FOOD] Break [FOOD]
+        </div>`;
+    } else {
+      const [startStr, endStr] = item.time.split(" - ");
+      const startTime = parseTime(startStr);
+      const endTime = parseTime(endStr);
+
+      const start = new Date(now);
+      const end = new Date(now);
+      start.setHours(startTime.hours, startTime.minutes, 0, 0);
+      end.setHours(endTime.hours, endTime.minutes, 0, 0);
+
+      let cssClass = "bg-warning text-dark";
+      if (now >= start && now <= end) cssClass = "bg-success text-white";
+      else if (now > end) cssClass = "bg-danger text-white";
+
+      const fullLabel = `${item.subject || ''}${item.teacher ? ` (${item.teacher})` : ''}${item.room ? ` [${item.room}]` : ''}`;
+
+      html += `
+        <div class="border rounded px-3 py-2 ${cssClass}" title="${item.time}">
+          <div class="fw-bold text-center">${fullLabel}</div>
+        </div>`;
+    }
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+renderTimetable(currentDay);
