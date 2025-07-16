@@ -346,6 +346,13 @@ updateClock();
 
 // TIMETABLE
 const timetable = {
+  Wednesday: [
+    { time: "10:11 AM - 10:12 AM", subject: "Test", teacher: "non", room: "RN-4212" },
+    { time: "10:12 AM - 10:13 AM", subject: "Test", teacher: "non", room: "RN-4201" },
+	{ time: "10:13 AM - 01:14 PM", subject: "Test", teacher: "non", room: "RN-4212" },
+    { break: true },
+    { time: "02:25 PM - 03:20 PM", subject: "ED", teacher: "DMS", room: "RN-4212" }
+  ],
   Monday: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BS", room: "RN-4212" },
     { time: "11:40 AM - 12:35 PM", subject: "WT", teacher: "MB", room: "RN-4212" },
@@ -362,7 +369,7 @@ const timetable = {
     { time: "03:20 PM - 04:15 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
     { time: "04:15 PM - 05:10 PM", subject: "ED", teacher: "DRP", room: "RN-3212(B)" }
   ],
-  Wednesday: [
+  Wednesdaay: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "YD", room: "RN-4212" },
     { time: "11:40 AM - 12:35 PM", subject: "Seminar", teacher: "SPP", room: "RN-4201" },
 	{ time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
@@ -440,7 +447,6 @@ function renderTimetable(day) {
       const timerId = `timer-${day}-${index}`;
       const slotId = `slot-${timerId}`;
 
-      // ✅ Set correct color immediately
       let initialClass = "";
       if (now >= start && now <= end) {
         initialClass = "bg-success text-white";
@@ -460,38 +466,32 @@ function renderTimetable(day) {
           </div>
         </div>`;
 
-      // ✅ Only apply timer + dynamic color if current class is running
-      if (now >= start && now <= end) {
-        setInterval(() => {
-          const current = new Date();
-          const diff = end - current;
-          const timerEl = document.getElementById(timerId);
-          const slotEl = document.getElementById(slotId);
+      // ✅ Timer only for green slot
+      setInterval(() => {
+        const nowCurrent = new Date();
+        const timerEl = document.getElementById(timerId);
+        const slotEl = document.getElementById(slotId);
+        if (!timerEl || !slotEl) return;
 
-          if (!timerEl || !slotEl) return;
+        // Color update
+        slotEl.classList.remove("bg-success", "bg-warning", "bg-danger", "text-white", "text-dark");
 
-          if (diff >= 0) {
-            const hrs = Math.floor(diff / 3600000);
-            const mins = Math.floor((diff % 3600000) / 60000);
-            const secs = Math.floor((diff % 60000) / 1000);
-            timerEl.textContent = `⏳ ${hrs} hour ${mins} min ${secs} sec left`;
-          } else {
-            timerEl.textContent = `⏳ Over`;
-          }
+        if (nowCurrent >= start && nowCurrent <= end) {
+          slotEl.classList.add("bg-success", "text-white");
 
-          // ✅ Reapply correct color
-          slotEl.classList.remove("bg-success", "bg-warning", "bg-danger", "text-white", "text-dark");
-
-          const nowAgain = new Date();
-          if (nowAgain >= start && nowAgain <= end) {
-            slotEl.classList.add("bg-success", "text-white");
-          } else if (nowAgain > end) {
-            slotEl.classList.add("bg-danger", "text-white");
-          } else {
-            slotEl.classList.add("bg-warning", "text-dark");
-          }
-        }, 1000);
-      }
+          const diff = end - nowCurrent;
+          const hrs = Math.floor(diff / 3600000);
+          const mins = Math.floor((diff % 3600000) / 60000);
+          const secs = Math.floor((diff % 60000) / 1000);
+          timerEl.textContent = `⏳ ${hrs} hour ${mins} min ${secs} sec left`;
+        } else if (nowCurrent > end) {
+          slotEl.classList.add("bg-danger", "text-white");
+          timerEl.textContent = "";
+        } else {
+          slotEl.classList.add("bg-warning", "text-dark");
+          timerEl.textContent = "";
+        }
+      }, 1000);
     }
   });
 
