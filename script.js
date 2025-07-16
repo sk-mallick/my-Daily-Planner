@@ -346,13 +346,13 @@ updateClock();
 
 // TIMETABLE
 const timetable = {
-  Wednesday: [
-    { time: "10:11 AM - 10:12 AM", subject: "Test", teacher: "non", room: "RN-4212" },
-    { time: "10:12 AM - 10:13 AM", subject: "Test", teacher: "non", room: "RN-4201" },
-	{ time: "10:13 AM - 01:14 PM", subject: "Test", teacher: "non", room: "RN-4212" },
-    { break: true },
-    { time: "02:25 PM - 03:20 PM", subject: "ED", teacher: "DMS", room: "RN-4212" }
-  ],
+//   Wednesday: [
+//     { time: "10:11 AM - 10:12 AM", subject: "Test", teacher: "non", room: "RN-4212" },
+//     { time: "10:12 AM - 10:13 AM", subject: "Test", teacher: "non", room: "RN-4201" },
+// 	{ time: "10:13 AM - 01:14 PM", subject: "Test", teacher: "non", room: "RN-4212" },
+//     { break: true },
+//     { time: "02:25 PM - 03:20 PM", subject: "ED", teacher: "DMS", room: "RN-4212" }
+//   ],
   Monday: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "BS", room: "RN-4212" },
     { time: "11:40 AM - 12:35 PM", subject: "WT", teacher: "MB", room: "RN-4212" },
@@ -369,7 +369,7 @@ const timetable = {
     { time: "03:20 PM - 04:15 PM", subject: "AIML", teacher: "MB", room: "RN-4212" },
     { time: "04:15 PM - 05:10 PM", subject: "ED", teacher: "DRP", room: "RN-3212(B)" }
   ],
-  Wednesdaay: [
+  Wednesday: [
     { time: "10:45 AM - 11:40 AM", subject: "OS", teacher: "YD", room: "RN-4212" },
     { time: "11:40 AM - 12:35 PM", subject: "Seminar", teacher: "SPP", room: "RN-4201" },
 	{ time: "12:35 PM - 01:30 PM", subject: "EE", teacher: "MRS", room: "RN-4212" },
