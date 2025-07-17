@@ -14,13 +14,11 @@
 	<body class="bg-light">
 		<!-- Header -->
 		<header class="app-header">
-			<div class="container-fluid d-flex justify-content-between align-items-center">
-				<h1 class="app-title">📅 My Daily Planner</h1>
-				<div class="header-actions">
-					<button id="themeToggle" class="btn btn-link text-dark" onclick="toggleTheme()">
-						<i class="fas fa-moon"></i>
-					</button>
-				</div>
+			<div class="container-fluid">
+				<h1 class="app-title">
+					<i class="fas fa-calendar-alt"></i>
+					My Daily Planner
+				</h1>
 			</div>
 		</header>
 
@@ -91,19 +89,19 @@
 								<i class="fas fa-tasks"></i> To-Do
 							</span>
 							<div class="btn-group">
-								<button class="btn btn-sm btn-primary" onclick="handleMenuAction('new', event)" data-bs-toggle="tooltip" title="Add New Task">
+								<button class="btn btn-sm btn-primary" onclick="handleMenuAction('new', event)" title="Add New Task">
 									<i class="fas fa-plus"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-primary" onclick="handleMenuAction('all', event)" data-bs-toggle="tooltip" title="All Tasks">
+								<button class="btn btn-sm btn-outline-primary" onclick="handleMenuAction('all', event)" title="View All Tasks">
 									<i class="fas fa-list"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-success" onclick="handleMenuAction('done', event)" data-bs-toggle="tooltip" title="Completed Tasks">
+								<button class="btn btn-sm btn-outline-success" onclick="handleMenuAction('done', event)" title="View Completed Tasks">
 									<i class="fas fa-check"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-warning" onclick="handleMenuAction('notdone', event)" data-bs-toggle="tooltip" title="Pending Tasks">
+								<button class="btn btn-sm btn-outline-warning" onclick="handleMenuAction('notdone', event)" title="View Pending Tasks">
 									<i class="fas fa-clock"></i>
 								</button>
-								<button id="deleteToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleDeleteMode()" data-bs-toggle="tooltip" title="Delete Mode">
+								<button id="deleteToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleDeleteMode()" title="Toggle Delete Mode">
 									<i class="fas fa-trash"></i>
 								</button>
 							</div>
@@ -152,19 +150,19 @@
 								<i class="fas fa-link"></i> Links
 							</span>
 							<div class="btn-group">
-								<button class="btn btn-sm btn-primary" onclick="toggleLinkForm()" data-bs-toggle="tooltip" title="Add New Link">
+								<button class="btn btn-sm btn-primary" onclick="toggleLinkForm()" title="Add New Link">
 									<i class="fas fa-plus"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn active" data-group="personal" onclick="switchLinkGroup('personal')" data-bs-toggle="tooltip" title="Personal Links">
+								<button class="btn btn-sm btn-outline-primary link-tab-btn active" data-group="personal" onclick="switchLinkGroup('personal')" title="Personal Links">
 									<i class="fas fa-user"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="quick" onclick="switchLinkGroup('quick')" data-bs-toggle="tooltip" title="Quick Access">
+								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="quick" onclick="switchLinkGroup('quick')" title="Quick Access Links">
 									<i class="fas fa-bolt"></i>
 								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="ai" onclick="switchLinkGroup('ai')" data-bs-toggle="tooltip" title="AI Tools">
+								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="ai" onclick="switchLinkGroup('ai')" title="AI Tools">
 									<i class="fas fa-robot"></i>
 								</button>
-								<button id="deleteLinkToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleLinkDeleteMode()" data-bs-toggle="tooltip" title="Delete Mode">
+								<button id="deleteLinkToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleLinkDeleteMode()" title="Toggle Delete Mode">
 									<i class="fas fa-trash"></i>
 								</button>
 							</div>

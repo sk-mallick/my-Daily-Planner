@@ -13,6 +13,7 @@
   --input-bg: #f7fafc;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --primary-rgb: 75, 108, 183;  /* This matches the primary color #4b6cb7 */
 }
 
 /* Dark Theme Colors */
@@ -29,6 +30,7 @@
   --input-bg: #1e293b;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+  --primary-rgb: 96, 165, 250;  /* This matches the dark mode primary color #60a5fa */
 }
 
 /* Base Styles */
@@ -48,18 +50,53 @@ body {
 /* Header Styles */
 .app-header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-  padding: 1rem;
+  padding: 1.2rem 1.5rem;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.app-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.app-header .container-fluid {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .app-title {
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.app-title i {
+  font-size: 1.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 /* Card Styles */
@@ -406,8 +443,17 @@ body {
 
 /* Responsive Styles */
 @media (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+  }
+  
   .app-title {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
+    gap: 0.5rem;
+  }
+  
+  .app-title i {
+    font-size: 1.5rem;
   }
   
   .card {
@@ -446,20 +492,6 @@ body {
   background-color: var(--bg-card);
   border-color: var(--border-color);
   color: var(--text-primary);
-}
-
-/* Theme Toggle Button */
-#themeToggle {
-  color: white;
-  font-size: 1.25rem;
-  padding: 0.5rem;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-#themeToggle:hover {
-  transform: rotate(180deg);
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Hide current date display */
@@ -564,4 +596,131 @@ body {
     background: var(--primary);
     border-radius: 5px;
   }
+}
+
+/* Custom Tooltip Styles */
+[title] {
+  position: relative;
+}
+
+[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+  padding: 0.3rem 0.6rem;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  pointer-events: none;
+  animation: tooltipSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: auto;
+  right: 10px;
+  transform: translateX(0);
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  pointer-events: none;
+  animation: tooltipSlide 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tooltipSlide {
+  from {
+    opacity: 0;
+    transform: translate(0, -3px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+/* Special tooltip positions for edge cases */
+[title].btn-group > *:first-child::after {
+  right: auto;
+  left: 0;
+}
+
+[title].btn-group > *:first-child::before {
+  right: auto;
+  left: 10px;
+}
+
+[title].btn-group > *:last-child::after {
+  left: auto;
+  right: 0;
+}
+
+[title].btn-group > *:last-child::before {
+  left: auto;
+  right: 10px;
+}
+
+/* Tooltip variations for different button types */
+.btn-primary[title]:hover::after {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(var(--primary-rgb), 0.9));
+}
+
+.btn-success[title]:hover::after {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(16, 185, 129, 0.9));
+}
+
+.btn-warning[title]:hover::after {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(245, 158, 11, 0.9));
+}
+
+.btn-danger[title]:hover::after {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(239, 68, 68, 0.9));
+}
+
+/* Special tooltip position for timetable items and links */
+#daily-timetable [title]:hover::after,
+.calendar-day[title]:hover::after,
+.link-wrapper [title]:hover::after {
+  bottom: auto;
+  top: calc(100% + 5px);
+  right: 0;
+}
+
+#daily-timetable [title]:hover::before,
+.calendar-day[title]:hover::before,
+.link-wrapper [title]:hover::before {
+  bottom: auto;
+  top: calc(100% + 2px);
+  right: 10px;
+  border-top: none;
+  border-bottom: 4px solid rgba(0, 0, 0, 0.85);
+}
+
+/* Ensure timetable and link tooltips don't get cut off */
+#daily-timetable,
+.calendar-grid,
+.link-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+#daily-timetable .time-slot,
+.calendar-day,
+.link-wrapper a {
+  position: relative;
+  z-index: 2;
 }
