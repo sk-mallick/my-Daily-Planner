@@ -425,6 +425,16 @@ function renderTimetable(day) {
   const container = document.getElementById("daily-timetable");
   const todaySchedule = timetable[day] || [];
 
+  if (todaySchedule.length === 0) {
+      container.innerHTML = `
+          <div class="text-center text-muted p-4">
+              <i class="fas fa-calendar-alt fa-2x mb-3"></i>
+              <p>No classes scheduled for ${day}</p>
+          </div>
+      `;
+      return;
+  }
+
   let html = `<div class="d-flex flex-column gap-2">`;
 
   todaySchedule.forEach((item, index) => {
@@ -500,4 +510,216 @@ function renderTimetable(day) {
 }
 
 
-renderTimetable(currentDay);
+// Calendar Variables
+let currentView = 'today';
+let selectedDate = new Date();
+let currentMonth = new Date();
+
+function switchTimetableView(view) {
+    currentView = view;
+    document.getElementById('todayViewBtn').classList.toggle('active', view === 'today');
+    document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+    document.getElementById('daily-timetable').classList.toggle('d-none', view === 'week');
+    document.getElementById('week-calendar').classList.toggle('d-none', view === 'today');
+
+    // Update Today button text
+    const todayBtn = document.getElementById('todayViewBtn');
+    if (selectedDate.toDateString() === new Date().toDateString()) {
+        todayBtn.innerHTML = '<i class="fas fa-calendar-day"></i> Today';
+    } else {
+        const dateStr = selectedDate.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short'
+        });
+        todayBtn.innerHTML = `<i class="fas fa-calendar-day"></i> ${dateStr}`;
+    }
+
+    if (view === 'week') {
+        renderCalendar();
+    } else {
+        renderTimetable(selectedDate.toLocaleDateString("en-US", { weekday: "long" }));
+    }
+}
+
+function renderCalendar() {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startingDay = firstDay.getDay();
+    const totalDays = lastDay.getDate();
+
+    // Update month display
+    document.getElementById('calendar-month').textContent = currentMonth.toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
+    });
+
+    let calendarHTML = '';
+
+    // Previous month days
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startingDay - 1; i >= 0; i--) {
+        const day = prevMonthLastDay - i;
+        calendarHTML += `<div class="calendar-day other-month"><span class="day-number">${day}</span></div>`;
+    }
+
+    // Current month days
+    for (let i = 1; i <= totalDays; i++) {
+        const date = new Date(year, month, i);
+        const isToday = date.toDateString() === new Date().toDateString();
+        const isSelected = date.toDateString() === selectedDate.toDateString();
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+        const hasClasses = timetable[dayName] ? 'has-classes' : '';
+        
+        calendarHTML += `
+            <div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasClasses}"
+                 onclick="selectDate(${year}, ${month}, ${i})">
+                <span class="day-number">${i}</span>
+            </div>`;
+    }
+
+    // Calculate remaining cells needed to complete the last week
+    const remainingDays = (7 - ((startingDay + totalDays) % 7)) % 7;
+    
+    // Next month days (only if needed to complete the last week)
+    for (let i = 1; i <= remainingDays; i++) {
+        calendarHTML += `<div class="calendar-day other-month"><span class="day-number">${i}</span></div>`;
+    }
+
+    document.getElementById('calendar-days').innerHTML = calendarHTML;
+}
+
+function changeMonth(delta) {
+    currentMonth.setMonth(currentMonth.getMonth() + delta);
+    renderCalendar();
+}
+
+function selectDate(year, month, day) {
+    selectedDate = new Date(year, month, day);
+    const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    if (currentView === 'week') {
+        renderCalendar();
+    }
+    
+    // Switch to today view and show selected day's timetable
+    switchTimetableView('today');
+}
+
+// Modify the existing renderTimetable function to handle the selected date
+function renderTimetable(day) {
+    const container = document.getElementById("daily-timetable");
+    const todaySchedule = timetable[day] || [];
+
+    if (todaySchedule.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted p-4">
+                <i class="fas fa-calendar-alt fa-2x mb-3"></i>
+                <p>No classes scheduled for ${day}</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `<div class="d-flex flex-column gap-2">`;
+
+    todaySchedule.forEach((item, index) => {
+        if (item.break) {
+            html += `
+                <div class="border border-secondary rounded px-3 py-2 text-muted fw-bold bg-light text-center" title="Break Time">
+                    [FOOD] Break [FOOD]
+                </div>`;
+        } else {
+            const [startStr, endStr] = item.time.split(" - ");
+            const startTime = parseTime(startStr);
+            const endTime = parseTime(endStr);
+
+            const start = new Date(selectedDate);
+            const end = new Date(selectedDate);
+            start.setHours(startTime.hours, startTime.minutes, 0, 0);
+            end.setHours(endTime.hours, endTime.minutes, 0, 0);
+            const now = new Date();
+            const timerId = `timer-${day}-${index}`;
+            const slotId = `slot-${timerId}`;
+
+            // Compare dates without time
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const compareDate = new Date(selectedDate);
+            compareDate.setHours(0, 0, 0, 0);
+
+            let initialClass = "";
+            if (compareDate.getTime() === today.getTime()) {
+                // Today's schedule
+                if (now >= start && now <= end) {
+                    initialClass = "bg-success text-white";
+                } else if (now > end) {
+                    initialClass = "bg-danger text-white";
+                } else {
+                    initialClass = "bg-warning text-dark";
+                }
+            } else if (compareDate > today) {
+                // Future date
+                initialClass = "bg-warning text-dark";
+            } else {
+                // Past date
+                initialClass = "bg-danger text-white";
+            }
+
+            const fullLabel = `${item.subject}${item.teacher ? ` (${item.teacher})` : ''}${item.room ? ` [${item.room}]` : ''}`;
+
+            html += `
+                <div id="${slotId}" class="border rounded px-3 py-2 ${initialClass} text-center" title="${item.time}">
+                    <div class="d-flex flex-column gap-1">
+                        <span class="fw-bold" style="word-break: break-word;">${fullLabel}</span>
+                        <span id="${timerId}" class="small fw-normal text-center d-block text-nowrap"></span>
+                    </div>
+                </div>`;
+
+            // Only add timer for today's current classes
+            if (compareDate.getTime() === today.getTime() && now >= start && now <= end) {
+                setInterval(() => {
+                    const nowCurrent = new Date();
+                    const timerEl = document.getElementById(timerId);
+                    if (!timerEl) return;
+
+                    if (nowCurrent >= start && nowCurrent <= end) {
+                        const diff = end - nowCurrent;
+                        const hrs = Math.floor(diff / 3600000);
+                        const mins = Math.floor((diff % 3600000) / 60000);
+                        const secs = Math.floor((diff % 60000) / 1000);
+                        timerEl.textContent = `⏳ ${hrs} hour ${mins} min ${secs} sec left`;
+                    }
+                }, 1000);
+            }
+        }
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+
+// Initialize calendar when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize everything
+    loadTodos();
+    switchLinkGroup("personal");
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Set initial view to today's timetable
+    currentView = 'today';
+    selectedDate = new Date();
+    const today = selectedDate.toLocaleDateString("en-US", { weekday: "long" });
+    
+    // Make sure today's view is active
+    document.getElementById('todayViewBtn').classList.add('active');
+    document.getElementById('weekViewBtn').classList.remove('active');
+    document.getElementById('daily-timetable').classList.remove('d-none');
+    document.getElementById('week-calendar').classList.add('d-none');
+    
+    // Render today's timetable
+    renderTimetable(today);
+});
