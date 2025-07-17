@@ -82,6 +82,13 @@ body {
   padding: 1rem;
 }
 
+/* Fix the border-bottom for To-Do and Links sections */
+#todo-section .card-header,
+#links-section .card-header {
+  border-bottom: 1px solid var(--border-color) !important;
+  margin-bottom: 1rem;
+}
+
 .card-body {
   background-color: var(--bg-card);
 }
@@ -192,11 +199,37 @@ body {
   border: 1px solid var(--border-color);
 }
 
-.link-wrapper a:hover {
+/* Only apply hover effect when not in delete mode */
+.link-wrapper:not(.delete-mode) a:hover {
   transform: translateY(-5px);
   background: var(--primary);
   color: white;
   box-shadow: var(--shadow-hover);
+}
+
+.delete-icon {
+  position: absolute;
+  top: var(--border-color);
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: var(--bg-card);
+  border: 1px solid #dc3545;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+.delete-icon:hover {
+  background: #dc3545;
+  color: white;
 }
 
 /* Custom Scrollbar */
@@ -437,13 +470,39 @@ body {
 /* Desktop Mode Height Adjustments */
 @media (min-width: 769px) {
   .card {
-    min-height: 372.400px;
+    min-height: 458.600px;
     max-height: 458.600px;
+    height: 458.600px;
   }
   
-  #todoListWrapper, #linkListWrapper {
-    max-height: 300px;
+  .card-body {
+    height: calc(100% - 56px); /* Adjust for card header */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #todoForm {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+  }
+  
+  #todoListWrapper {
+    flex: 1;
+    min-height: 0; /* Important for flex child scrolling */
     overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  #todoListWrapper .list-group {
+    height: auto;
+  }
+  
+  #linkListWrapper {
+    height: calc(100% - 10px);
+    overflow-y: auto;
+    margin-bottom: 10px;
   }
   
   #todoListWrapper::-webkit-scrollbar,
@@ -459,6 +518,49 @@ body {
   
   #todoListWrapper::-webkit-scrollbar-thumb,
   #linkListWrapper::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 5px;
+  }
+}
+
+/* Responsive Mode Styles */
+@media (max-width: 768px) {
+  #todo-section .card {
+    min-height: 458.600px;
+    max-height: 458.600px;
+    height: 458.600px;
+  }
+
+  #todo-section .card-body {
+    height: calc(100% - 56px);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #todoForm {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+  }
+
+  #todoListWrapper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  #todoListWrapper::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  #todoListWrapper::-webkit-scrollbar-track {
+    background: var(--input-bg);
+    border-radius: 5px;
+  }
+
+  #todoListWrapper::-webkit-scrollbar-thumb {
     background: var(--primary);
     border-radius: 5px;
   }

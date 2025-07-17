@@ -235,9 +235,12 @@ function renderLinks() {
 
 	const storedLinks = JSON.parse(localStorage.getItem(`links-${currentLinkGroup}`)) || [];
 
-	storedLinks.forEach(link => {
+	storedLinks.forEach((link, index) => {
 		const wrapper = document.createElement("div");
 		wrapper.className = "link-wrapper";
+		if (linkDeleteMode) {
+			wrapper.classList.add("delete-mode");
+		}
 
 		const a = document.createElement("a");
 		a.href = link.url;
@@ -248,32 +251,23 @@ function renderLinks() {
 		a.style.width = "51.4px";
 		a.style.height = "51.4px";
 		a.style.fontSize = "1.3rem";
-		a.style.background = "var(--input-bg)";
-		a.style.borderColor = "#ccc";
-		a.style.color = "var(--primary)";
-		a.onmouseenter = () => {
-			a.style.background = link.color;
-			a.style.color = "#111";
-		};
-		a.onmouseleave = () => {
-			a.style.background = "var(--input-bg)";
-			a.style.color = "var(--primary)";
-		};
-
-		wrapper.appendChild(a);
 
 		if (linkDeleteMode) {
-			const del = document.createElement("span");
-			del.className = "delete-icon";
-			del.innerHTML = "×";
-			del.onclick = () => {
-				const updated = storedLinks.filter(l => l.url !== link.url);
-				localStorage.setItem(`links-${currentLinkGroup}`, JSON.stringify(updated));
+			const deleteBtn = document.createElement("span");
+			deleteBtn.className = "delete-icon";
+			deleteBtn.innerHTML = "×";
+			deleteBtn.onclick = (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				const links = JSON.parse(localStorage.getItem(`links-${currentLinkGroup}`)) || [];
+				links.splice(index, 1);
+				localStorage.setItem(`links-${currentLinkGroup}`, JSON.stringify(links));
 				renderLinks();
 			};
-			wrapper.appendChild(del);
+			wrapper.appendChild(deleteBtn);
 		}
 
+		wrapper.appendChild(a);
 		container.appendChild(wrapper);
 	});
 }
