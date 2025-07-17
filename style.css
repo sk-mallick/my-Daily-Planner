@@ -69,9 +69,6 @@ body {
   border-radius: 1rem;
   box-shadow: var(--shadow);
   transition: all 0.3s ease;
-  min-height: 372.4px;
-  max-height: 458.6px;
-  overflow: hidden;
 }
 
 .hover-card:hover {
@@ -87,23 +84,6 @@ body {
 
 .card-body {
   background-color: var(--bg-card);
-  overflow-y: auto;
-  height: calc(100% - 56px); /* Subtract header height */
-}
-
-/* Custom Scrollbar for Card Body */
-.card-body::-webkit-scrollbar {
-  width: 5px;
-}
-
-.card-body::-webkit-scrollbar-track {
-  background: var(--input-bg);
-  border-radius: 5px;
-}
-
-.card-body::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 5px;
 }
 
 /* Button Styles */
@@ -398,8 +378,6 @@ body {
   }
   
   .card {
-    min-height: auto;
-    max-height: none;
     margin-bottom: 1rem;
   }
   
@@ -454,4 +432,34 @@ body {
 /* Hide current date display */
 #current-date {
     display: none !important;
+}
+
+/* Desktop Mode Height Adjustments */
+@media (min-width: 769px) {
+  .card {
+    min-height: 372.400px;
+    max-height: 458.600px;
+  }
+  
+  #todoListWrapper, #linkListWrapper {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  #todoListWrapper::-webkit-scrollbar,
+  #linkListWrapper::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  #todoListWrapper::-webkit-scrollbar-track,
+  #linkListWrapper::-webkit-scrollbar-track {
+    background: var(--input-bg);
+    border-radius: 5px;
+  }
+  
+  #todoListWrapper::-webkit-scrollbar-thumb,
+  #linkListWrapper::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 5px;
+  }
 }
