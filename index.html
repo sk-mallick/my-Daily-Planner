@@ -12,210 +12,280 @@
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body class="bg-light">
-		<!-- Header -->
-		<header class="app-header">
-			<div class="container-fluid">
-				<h1 class="app-title">
-					<i class="fas fa-calendar-alt"></i>
-					My Daily Planner
-				</h1>
-			</div>
-		</header>
-
-		<div class="container-fluid py-4 px-3">
-			<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
-				<!-- ⏰ Clock Section -->
-				<div class="col">
-					<div class="card text-center h-100 hover-card">
-						<div class="card-body d-flex flex-column justify-content-center align-items-center">
-							<div id="clockTime" class="display-5 fw-bold text-primary"></div>
-							<div id="clockDay" class="h5 text-secondary mt-2"></div>
-							<div id="clockDate" class="text-muted small"></div>
+		<!-- Main App Content -->
+		<div id="appContent">
+			<!-- Header -->
+			<header class="app-header">
+				<div class="container-fluid">
+					<div class="row align-items-center">
+						<!-- Desktop View -->
+						<div class="col-auto d-none d-sm-block">
+							<h1 class="app-title mb-0">
+								<i class="fas fa-calendar-alt me-2"></i>
+								My Daily Planner
+							</h1>
 						</div>
-					</div>
-				</div>
-
-				<!-- 📅 Timetable Section -->
-				<div class="col">
-					<div class="card h-100">
-						<div class="card-header d-flex justify-content-between align-items-center bg-white">
-							<span class="fw-bold text-primary d-flex align-items-center gap-2">
-								<i class="fas fa-calendar-alt"></i> Timetable
-								<small id="current-date" class="text-muted fw-normal"></small>
-							</span>
-							<div class="btn-group">
-								<button class="btn btn-sm btn-outline-primary active" onclick="switchTimetableView('today')" id="todayViewBtn">
-									<i class="fas fa-calendar-day"></i> Today
-								</button>
-								<button class="btn btn-sm btn-outline-primary" onclick="switchTimetableView('week')" id="weekViewBtn">
-									<i class="fas fa-calendar-week"></i> Week
-								</button>
-							</div>
-						</div>
-						<div class="card-body">
-							<div id="daily-timetable" class="justify-content-evenly"></div>
-							<div id="week-calendar" class="d-none">
-								<div class="calendar-header d-flex justify-content-between align-items-center mb-3">
-									<button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">
-										<i class="fas fa-chevron-left"></i>
-									</button>
-									<h6 class="mb-0" id="calendar-month">September 2023</h6>
-									<button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">
-										<i class="fas fa-chevron-right"></i>
-									</button>
-								</div>
-								<div class="calendar-grid">
-									<div class="calendar-days-header">
-										<div>Sun</div>
-										<div>Mon</div>
-										<div>Tue</div>
-										<div>Wed</div>
-										<div>Thu</div>
-										<div>Fri</div>
-										<div>Sat</div>
+						<div class="col d-none d-sm-block">
+							<div class="d-flex align-items-center justify-content-end gap-4">
+								<span id="userDisplay" class="text-white d-flex align-items-center">
+									<div class="user-avatar me-2 position-relative">
+										<i class="fas fa-user-circle"></i>
+										<span class="user-status"></span>
 									</div>
-									<div id="calendar-days" class="calendar-days"></div>
+									<div class="user-info">
+										<div class="user-name fw-bold text-truncate"></div>
+										<div class="user-details small opacity-75">
+											<span class="user-reg me-2"></span>
+											<span class="user-branch"></span>
+										</div>
+									</div>
+								</span>
+								<div class="header-actions d-flex align-items-center gap-2">
+									<button class="btn btn-icon">
+										<i class="fas fa-cog"></i>
+									</button>
+									<button class="btn btn-icon">
+										<i class="fas fa-bell"></i>
+									</button>
+									<div class="vr bg-white opacity-25"></div>
+									<button id="logoutBtn" class="btn btn-outline-light">
+										<i class="fas fa-sign-out-alt me-2"></i>
+										<span>Logout</span>
+									</button>
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
 
-				<!-- ✅ To-Do Section -->
-				<div class="col" id="todo-section">
-					<div class="card h-100 hover-card">
-						<div class="card-header d-flex justify-content-between align-items-center bg-white">
-							<span class="fw-bold text-primary">
-								<i class="fas fa-tasks"></i> To-Do
-							</span>
-							<div class="btn-group">
-								<button class="btn btn-sm btn-primary" onclick="handleMenuAction('new', event)" title="Add New Task">
-									<i class="fas fa-plus"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-primary" onclick="handleMenuAction('all', event)" title="View All Tasks">
-									<i class="fas fa-list"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-success" onclick="handleMenuAction('done', event)" title="View Completed Tasks">
-									<i class="fas fa-check"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-warning" onclick="handleMenuAction('notdone', event)" title="View Pending Tasks">
-									<i class="fas fa-clock"></i>
-								</button>
-								<button id="deleteToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleDeleteMode()" title="Toggle Delete Mode">
-									<i class="fas fa-trash"></i>
-								</button>
-							</div>
-						</div>
-						<div class="card-body">
-							<form id="todoForm" class="mb-3 d-none animate-form">
-								<div class="mb-2">
-									<label class="form-label">Task Title</label>
-									<input type="text" class="form-control custom-input" id="todoTitle" placeholder="Enter task name" />
+						<!-- Mobile View -->
+						<div class="col-12 d-block d-sm-none">
+							<div class="user-info-mobile">
+								<div class="user-avatar">
+									<i class="fas fa-user-circle"></i>
 								</div>
-								<div class="row g-2 mb-2">
-									<div class="col-6">
-										<label class="form-label">Priority</label>
-										<select class="form-select custom-select" id="todoPriority">
-											<option value="High">High Priority</option>
-											<option value="Medium">Medium Priority</option>
-											<option value="Low">Low Priority</option>
-										</select>
-									</div>
-									<div class="col-6">
-										<label class="form-label">Deadline</label>
-										<input type="date" class="form-control custom-input" id="todoDeadline" />
+								<div class="user-details-mobile">
+									<div class="user-name-mobile"></div>
+									<div class="user-meta-mobile">
+										<div class="user-meta-item">
+											<i class="fas fa-id-card"></i>
+											<span class="user-reg"></span>
+										</div>
+										<div class="user-meta-item">
+											<i class="fas fa-code-branch"></i>
+											<span class="user-branch"></span>
+										</div>
+										<div class="user-meta-item">
+											<i class="fas fa-users"></i>
+											<span class="user-group"></span>
+										</div>
 									</div>
 								</div>
-								<div class="d-flex gap-2">
-									<button type="button" class="btn btn-success flex-grow-1" onclick="addTodo()">
-										<i class="fas fa-plus"></i> Add Task
-									</button>
-									<button type="button" class="btn btn-outline-secondary" onclick="toggleTodoForm()">
-										<i class="fas fa-times"></i>
+								<div class="header-actions-mobile">
+									<button id="logoutBtnMobile" class="btn btn-icon">
+										<i class="fas fa-sign-out-alt"></i>
 									</button>
 								</div>
-							</form>
-							<div id="todoListWrapper" class="overflow-auto custom-scrollbar">
-								<ul id="todo-list" class="list-group"></ul>
 							</div>
 						</div>
 					</div>
 				</div>
+			</header>
 
-				<!-- 🔗 Links Section -->
-				<div class="col" id="links-section">
-					<div class="card h-100 hover-card">
-						<div class="card-header d-flex justify-content-between align-items-center bg-white">
-							<span class="fw-bold text-primary">
-								<i class="fas fa-link"></i> Links
-							</span>
-							<div class="btn-group">
-								<button class="btn btn-sm btn-primary" onclick="toggleLinkForm()" title="Add New Link">
-									<i class="fas fa-plus"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn active" data-group="personal" onclick="switchLinkGroup('personal')" title="Personal Links">
-									<i class="fas fa-user"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="quick" onclick="switchLinkGroup('quick')" title="Quick Access Links">
-									<i class="fas fa-bolt"></i>
-								</button>
-								<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="ai" onclick="switchLinkGroup('ai')" title="AI Tools">
-									<i class="fas fa-robot"></i>
-								</button>
-								<button id="deleteLinkToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleLinkDeleteMode()" title="Toggle Delete Mode">
-									<i class="fas fa-trash"></i>
-								</button>
+			<!-- Main Content -->
+			<div class="container-fluid py-4 px-3">
+				<div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
+					<!-- ⏰ Clock Section -->
+					<div class="col">
+						<div class="card text-center h-100 hover-card">
+							<div class="card-body d-flex flex-column justify-content-center align-items-center">
+								<div id="clockTime" class="display-5 fw-bold text-primary"></div>
+								<div id="clockDay" class="h5 text-secondary mt-2"></div>
+								<div id="clockDate" class="text-muted small"></div>
 							</div>
 						</div>
-						<div class="card-body">
-							<div id="linkFormWrapper" class="mb-3 d-none animate-form">
-								<form id="linkForm">
+					</div>
+
+					<!-- 📅 Timetable Section -->
+					<div class="col">
+						<div class="card h-100 hover-card">
+							<div class="card-header d-flex justify-content-between align-items-center bg-white">
+								<span class="fw-bold text-primary d-flex align-items-center gap-2">
+									<i class="fas fa-calendar-alt"></i> Timetable
+									<small id="current-date" class="text-muted fw-normal"></small>
+								</span>
+								<div class="btn-group">
+									<button class="btn btn-sm btn-outline-primary active" onclick="switchTimetableView('today')" id="todayViewBtn">
+										<i class="fas fa-calendar-day"></i> Today
+									</button>
+									<button class="btn btn-sm btn-outline-primary" onclick="switchTimetableView('week')" id="weekViewBtn">
+										<i class="fas fa-calendar-week"></i> Week
+									</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<div id="daily-timetable" class="justify-content-evenly"></div>
+								<div id="week-calendar" class="d-none">
+									<div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+										<button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(-1)">
+											<i class="fas fa-chevron-left"></i>
+										</button>
+										<h6 class="mb-0" id="calendar-month">September 2023</h6>
+										<button class="btn btn-sm btn-outline-secondary" onclick="changeMonth(1)">
+											<i class="fas fa-chevron-right"></i>
+										</button>
+									</div>
+									<div class="calendar-grid">
+										<div class="calendar-days-header">
+											<div>Sun</div>
+											<div>Mon</div>
+											<div>Tue</div>
+											<div>Wed</div>
+											<div>Thu</div>
+											<div>Fri</div>
+											<div>Sat</div>
+										</div>
+										<div id="calendar-days" class="calendar-days"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ✅ To-Do Section -->
+					<div class="col" id="todo-section">
+						<div class="card h-100 hover-card">
+							<div class="card-header d-flex justify-content-between align-items-center bg-white">
+								<span class="fw-bold text-primary">
+									<i class="fas fa-tasks"></i> To-Do
+								</span>
+								<div class="btn-group">
+									<button class="btn btn-sm btn-primary" onclick="handleMenuAction('new', event)" title="Add New Task">
+										<i class="fas fa-plus"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-primary" onclick="handleMenuAction('all', event)" title="View All Tasks">
+										<i class="fas fa-list"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-success" onclick="handleMenuAction('done', event)" title="View Completed Tasks">
+										<i class="fas fa-check"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-warning" onclick="handleMenuAction('notdone', event)" title="View Pending Tasks">
+										<i class="fas fa-clock"></i>
+									</button>
+									<button id="deleteToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleDeleteMode()" title="Toggle Delete Mode">
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<form id="todoForm" class="mb-3 d-none animate-form">
 									<div class="mb-2">
-										<label class="form-label">Link Name</label>
-										<input type="text" class="form-control custom-input" id="linkName" placeholder="e.g. GitHub" />
-									</div>
-									<div class="mb-2">
-										<label class="form-label">URL</label>
-										<input type="text" class="form-control custom-input" id="linkURL" placeholder="https://..." />
+										<label class="form-label">Task Title</label>
+										<input type="text" class="form-control custom-input" id="todoTitle" placeholder="Enter task name" />
 									</div>
 									<div class="row g-2 mb-2">
-										<div class="col-4">
-											<label class="form-label">Category</label>
-											<select class="form-select custom-select" id="linkGroup">
-												<option value="personal">Personal</option>
-												<option value="quick">Quick Access</option>
-												<option value="ai">AI Tools</option>
+										<div class="col-6">
+											<label class="form-label">Priority</label>
+											<select class="form-select custom-select" id="todoPriority">
+												<option value="High">High Priority</option>
+												<option value="Medium">Medium Priority</option>
+												<option value="Low">Low Priority</option>
 											</select>
 										</div>
-										<div class="col-4">
-											<label class="form-label">Color</label>
-											<input type="color" class="form-control form-control-color w-100" id="linkColor" value="#4b6cb7" />
-										</div>
-										<div class="col-4">
-											<label class="form-label">Icon</label>
-											<select class="form-select custom-select" id="linkIcon">
-												<option value="">Auto</option>
-												<option value="fab fa-github">GitHub</option>
-												<option value="fab fa-google">Google</option>
-												<option value="fas fa-book">Notion</option>
-												<option value="fas fa-robot">ChatGPT</option>
-												<option value="fab fa-youtube">YouTube</option>
-												<option value="fab fa-linkedin">LinkedIn</option>
-											</select>
+										<div class="col-6">
+											<label class="form-label">Deadline</label>
+											<input type="date" class="form-control custom-input" id="todoDeadline" />
 										</div>
 									</div>
 									<div class="d-flex gap-2">
-										<button type="button" class="btn btn-success flex-grow-1" onclick="addLink()">
-											<i class="fas fa-plus"></i> Add Link
+										<button type="button" class="btn btn-success flex-grow-1" onclick="addTodo()">
+											<i class="fas fa-plus"></i> Add Task
 										</button>
-										<button type="button" class="btn btn-outline-secondary" onclick="toggleLinkForm()">
+										<button type="button" class="btn btn-outline-secondary" onclick="toggleTodoForm()">
 											<i class="fas fa-times"></i>
 										</button>
 									</div>
 								</form>
+								<div id="todoListWrapper" class="overflow-auto custom-scrollbar">
+									<ul id="todo-list" class="list-group"></ul>
+								</div>
 							</div>
-							<div id="linkListWrapper" class="overflow-auto custom-scrollbar">
-								<div id="tab-links" class="d-flex flex-wrap gap-2 p-2"></div>
+						</div>
+					</div>
+
+					<!-- 🔗 Links Section -->
+					<div class="col" id="links-section">
+						<div class="card h-100 hover-card">
+							<div class="card-header d-flex justify-content-between align-items-center bg-white">
+								<span class="fw-bold text-primary">
+									<i class="fas fa-link"></i> Links
+								</span>
+								<div class="btn-group">
+									<button class="btn btn-sm btn-primary" onclick="toggleLinkForm()" title="Add New Link">
+										<i class="fas fa-plus"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-primary link-tab-btn active" data-group="personal" onclick="switchLinkGroup('personal')" title="Personal Links">
+										<i class="fas fa-user"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="quick" onclick="switchLinkGroup('quick')" title="Quick Access Links">
+										<i class="fas fa-bolt"></i>
+									</button>
+									<button class="btn btn-sm btn-outline-primary link-tab-btn" data-group="ai" onclick="switchLinkGroup('ai')" title="AI Tools">
+										<i class="fas fa-robot"></i>
+									</button>
+									<button id="deleteLinkToggleBtn" class="btn btn-sm btn-outline-danger" onclick="toggleLinkDeleteMode()" title="Toggle Delete Mode">
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+							</div>
+							<div class="card-body">
+								<div id="linkFormWrapper" class="mb-3 d-none animate-form">
+									<form id="linkForm">
+										<div class="mb-2">
+											<label class="form-label">Link Name</label>
+											<input type="text" class="form-control custom-input" id="linkName" placeholder="e.g. GitHub" />
+										</div>
+										<div class="mb-2">
+											<label class="form-label">URL</label>
+											<input type="text" class="form-control custom-input" id="linkURL" placeholder="https://..." />
+										</div>
+										<div class="row g-2 mb-2">
+											<div class="col-4">
+												<label class="form-label">Category</label>
+												<select class="form-select custom-select" id="linkGroup">
+													<option value="personal">Personal</option>
+													<option value="quick">Quick Access</option>
+													<option value="ai">AI Tools</option>
+												</select>
+											</div>
+											<div class="col-4">
+												<label class="form-label">Color</label>
+												<input type="color" class="form-control form-control-color w-100" id="linkColor" value="#4b6cb7" />
+											</div>
+											<div class="col-4">
+												<label class="form-label">Icon</label>
+												<select class="form-select custom-select" id="linkIcon">
+													<option value="">Auto</option>
+													<option value="fab fa-github">GitHub</option>
+													<option value="fab fa-google">Google</option>
+													<option value="fas fa-book">Notion</option>
+													<option value="fas fa-robot">ChatGPT</option>
+													<option value="fab fa-youtube">YouTube</option>
+													<option value="fab fa-linkedin">LinkedIn</option>
+												</select>
+											</div>
+										</div>
+										<div class="d-flex gap-2">
+											<button type="button" class="btn btn-success flex-grow-1" onclick="addLink()">
+												<i class="fas fa-plus"></i> Add Link
+											</button>
+											<button type="button" class="btn btn-outline-secondary" onclick="toggleLinkForm()">
+												<i class="fas fa-times"></i>
+											</button>
+										</div>
+									</form>
+								</div>
+								<div id="linkListWrapper" class="overflow-auto custom-scrollbar">
+									<div id="tab-links" class="d-flex flex-wrap gap-2 p-2"></div>
+								</div>
 							</div>
 						</div>
 					</div>

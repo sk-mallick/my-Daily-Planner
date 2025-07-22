@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - Student Planner</title>
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-light">
+    <div class="auth-section">
+        <div class="auth-container signup-container">
+            <!-- Brand Logo -->
+            <div class="brand-logo">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="signup-progress mb-4">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 50%;" id="progressBar"></div>
+                </div>
+                <div class="steps-wrapper">
+                    <span class="step active" id="step1Label">
+                        <span class="step-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </span>
+                        <span class="step-text">Basic Info</span>
+                    </span>
+                    <span class="step" id="step2Label">
+                        <span class="step-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </span>
+                        <span class="step-text">Academic Details</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="auth-content">
+                <div class="text-center mb-4">
+                    <h2 class="text-primary fw-bold mb-2">Create Account</h2>
+                    <p class="text-muted">5th Semester - 2023-27</p>
+                </div>
+
+                <!-- Step 1: Basic Info -->
+                <form id="signupForm" class="needs-validation" novalidate>
+                    <div id="step1" class="step-content active">
+                        <div class="floating-input mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="userName" required placeholder="Enter your full name">
+                            </div>
+                            <label for="userName">Full Name</label>
+                            <div class="invalid-feedback">Please enter your name</div>
+                        </div>
+                        <div class="floating-input mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                <input type="text" class="form-control" id="userRegNo" required placeholder="Enter your registration number">
+                            </div>
+                            <label for="userRegNo">Registration Number</label>
+                            <div class="invalid-feedback">Please enter your registration number</div>
+                        </div>
+                        <div class="floating-input mb-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="userPassword" required placeholder="Create a password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <label for="userPassword">Password</label>
+                            <div class="invalid-feedback">Please create a password</div>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-lg w-100" onclick="nextStep()">
+                            Continue <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Academic Info -->
+                    <div id="step2" class="step-content">
+                        <div class="floating-input mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-code-branch"></i></span>
+                                <select class="form-select" id="userBranch" required>
+                                    <option value="" disabled selected>Select your branch</option>
+                                    <option value="CSE-A">CSE-A</option>
+                                    <option value="CSE-B">CSE-B</option>
+                                    <option value="CSE-C">CSE-C</option>
+                                    <option value="CST-A">CST-A</option>
+                                    <option value="CST-B">CST-B</option>
+                                    <option value="CST-IT">CST-IT</option>
+                                    <option value="CSE-DS">CSE (DS)</option>
+                                    <option value="CS-AIML">CS(AI&ML)</option>
+                                    <option value="ETC-EV">ETC & EE(VD)</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="CIVIL">CIVIL</option>
+                                    <option value="BIO-TECH">BIO-TECH</option>
+                                </select>
+                            </div>
+                            <label for="userBranch">Branch</label>
+                            <div class="invalid-feedback">Please select your branch</div>
+                        </div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <div class="floating-input">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-graduation-cap"></i></span>
+                                        <input type="text" class="form-control" value="5th Semester" readonly>
+                                    </div>
+                                    <label>Semester</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="floating-input">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                        <select class="form-select" id="userGroup" required>
+                                            <option value="" disabled selected>Select group</option>
+                                            <option value="1">Group 1</option>
+                                            <option value="2">Group 2</option>
+                                        </select>
+                                    </div>
+                                    <label for="userGroup">Group</label>
+                                    <div class="invalid-feedback">Please select your group</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary btn-lg flex-grow-1" onclick="prevStep()">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg flex-grow-1">
+                                Create Account <i class="fas fa-check ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="auth-footer">
+                    <p class="text-center mb-0">
+                        Already have an account? 
+                        <a href="login.html" class="text-primary text-decoration-none">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html> 
